@@ -200,14 +200,7 @@ jobs:
         uses: aquasecurity/trivy-action@master
         with:
           image-ref: ${{ env.DOCKER_IMAGE }}:test
-          format: "sarif"
-          output: "trivy-results.sarif"
-
-      - name: Upload Trivy scan results
-        uses: github/codeql-action/upload-sarif@v2
-        if: always()
-        with:
-          sarif_file: "trivy-results.sarif"
+          format: "table"
 
   deploy-staging:
     name: Deploy to Staging
@@ -321,7 +314,7 @@ jobs:
 
       - name: Install performance testing tools
         run: |
-          pip install locust requests
+          pip install locust requests zope.event
 
       - name: Run performance tests
         run: |
