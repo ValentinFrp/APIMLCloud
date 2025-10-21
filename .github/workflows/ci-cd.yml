@@ -106,17 +106,50 @@ jobs:
           context: .
           push: false
           tags: ${{ env.DOCKER_IMAGE }}:test
+          load: true
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
       - name: Test Docker container
         run: |
+          echo "Available Docker images:"
+          docker images
+
+          if ! docker images | grep -q "${{ env.DOCKER_IMAGE }}"; then
+            echo "Error: Image ${{ env.DOCKER_IMAGE }}:test not found"
+            exit 1
+          fi
+
+          echo "Starting container..."
           docker run -d --name test-api -p 8000:8000 ${{ env.DOCKER_IMAGE }}:test
 
-          sleep 30
+          echo "Waiting for container to start..."
+          for i in {1..30}; do
+            if docker ps | grep -q test-api; then
+              echo "Container is running"
+              break
+            fi
+            echo "Waiting... ($i/30)"
+            sleep 2
+          done
 
-          curl -f http://localhost:8000/health || exit 1
+          docker ps -a
+          docker logs test-api
 
+          echo "Waiting for API to be ready..."
+          for i in {1..20}; do
+            if curl -s http://localhost:8000/health > /dev/null 2>&1; then
+              echo "API is ready!"
+              break
+            fi
+            echo "API not ready yet... ($i/20)"
+            sleep 3
+          done
+
+          echo "Testing health endpoint..."
+          curl -f http://localhost:8000/health
+
+          echo "Testing prediction endpoint..."
           curl -X POST "http://localhost:8000/predict" \
             -H "Content-Type: application/json" \
             -d '{
@@ -125,9 +158,11 @@ jobs:
               "age": 10.0,
               "location_score": 7.5,
               "garage": true
-            }' || exit 1
+            }'
 
+          echo "Stopping container..."
           docker stop test-api
+          docker rm test-api
 
       - name: Save Docker image
         if: github.ref == 'refs/heads/main'
