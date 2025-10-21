@@ -1,12 +1,10 @@
 #!/usr/bin/env python3
 
 import requests
-import json
 import sys
 import subprocess
 import time
 import os
-from threading import Thread
 
 
 def start_api_server():
@@ -97,9 +95,9 @@ def test_prediction():
             print("Prédiction OK")
             print(f"   Prix prédit: {data.get('predicted_price'):,.0f}€")
             ci = data.get("confidence_interval", {})
-            print(
-                f"   Intervalle confiance: {ci.get('lower', 0):,.0f}€ - {ci.get('upper', 0):,.0f}€"
-            )
+            lower = ci.get("lower", 0)
+            upper = ci.get("upper", 0)
+            print(f"   Intervalle confiance: {lower:,.0f}€ - {upper:,.0f}€")
             return True
         else:
             print(f"❌ Prédiction failed: {response.status_code}")
@@ -225,7 +223,7 @@ def main():
         try:
             response = requests.get("http://localhost:8000/health", timeout=2)
             print("Serveur API déjà en cours d'exécution")
-        except:
+        except Exception:
             print("Démarrage du serveur API...")
             server_process = start_api_server()
             if not server_process:
@@ -238,7 +236,7 @@ def main():
                 response = requests.get("http://localhost:8000/health", timeout=2)
                 if response.status_code == 200:
                     break
-            except:
+            except Exception:
                 time.sleep(1)
         else:
             print("❌ L'API n'a pas démarré dans les temps")
@@ -260,7 +258,7 @@ def main():
             result = test()
             results.append(result)
 
-        print(f"\nRésultats des tests:")
+        print("\nRésultats des tests:")
         print(f"Tests réussis: {sum(results)}/{len(results)}")
         print(f"❌ Tests échoués: {len(results) - sum(results)}/{len(results)}")
 

@@ -3,7 +3,7 @@ from pydantic import BaseModel, Field
 import joblib
 import numpy as np
 import os
-from typing import Dict, Any
+from typing import Dict
 import logging
 from datetime import datetime
 
@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 app = FastAPI(
     title="Housing Price Prediction API",
-    description="API de prédiction de prix immobilier basée sur les caractéristiques du bien",
+    description="API de prédiction de prix immobilier basée sur les caractéristiques",
     version="1.0.0",
     docs_url="/",
     redoc_url="/redoc",

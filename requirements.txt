@@ -13,10 +13,17 @@ joblib>=1.3.0
 # Testing
 pytest>=7.4.0
 httpx>=0.25.0
+pytest-cov>=4.1.0
 
 # Development and monitoring
 python-multipart>=0.0.6
 python-dotenv>=1.0.0
+
+# Code quality and development tools
+black>=23.0.0
+flake8>=6.0.0
+bandit>=1.7.0
+safety>=2.3.0
 
 # Logging and monitoring
 loguru>=0.7.0
