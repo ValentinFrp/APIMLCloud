@@ -57,8 +57,8 @@ def train_model():
     print("Génération des données d'entraînement...")
     df = generate_synthetic_data(2000)
 
-    os.makedirs("data", exist_ok=True)
-    df.to_csv("data/housing_data.csv", index=False)
+    os.makedirs("../data", exist_ok=True)
+    df.to_csv("../data/housing_data.csv", index=False)
     print(f"Données sauvegardées: {len(df)} échantillons")
 
     X = df[["surface", "rooms", "age", "location_score", "garage"]]
@@ -101,7 +101,7 @@ def train_model():
     for _, row in feature_importance.iterrows():
         print(f"- {row['feature']}: {row['importance']:.3f}")
 
-    os.makedirs("models", exist_ok=True)
+    os.makedirs("../models", exist_ok=True)
 
     model_info = {
         "model": model,
@@ -113,8 +113,8 @@ def train_model():
         "training_samples": len(X_train),
     }
 
-    joblib.dump(model_info, "models/housing_model.joblib")
-    print("Modèle sauvegardé dans 'models/housing_model.joblib'")
+    joblib.dump(model_info, "../models/housing_model.joblib")
+    print("Modèle sauvegardé dans '../models/housing_model.joblib'")
 
     return model_info
 
