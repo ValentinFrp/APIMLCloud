@@ -22,8 +22,8 @@ python-dotenv>=1.0.0
 # Code quality and development tools
 black>=23.0.0
 flake8>=6.0.0
-bandit>=1.7.0
-safety>=2.3.0
+semgrep>=1.140.0
+safety>=3.6.0
 
 # Logging and monitoring
 loguru>=0.7.0
