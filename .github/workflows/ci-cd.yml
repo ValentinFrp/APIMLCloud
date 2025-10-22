@@ -231,15 +231,16 @@ jobs:
 
       - name: Tag and push to registry
         run: |
-          docker tag ${{ env.DOCKER_IMAGE }}:test ${{ env.REGISTRY }}/${{ github.repository }}:staging
-          docker tag ${{ env.DOCKER_IMAGE }}:test ${{ env.REGISTRY }}/${{ github.repository }}:${{ github.sha }}
-          docker push ${{ env.REGISTRY }}/${{ github.repository }}:staging
-          docker push ${{ env.REGISTRY }}/${{ github.repository }}:${{ github.sha }}
+          REPO_LOWER=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+          docker tag ${{ env.DOCKER_IMAGE }}:test ${{ env.REGISTRY }}/${REPO_LOWER}:staging
+          docker tag ${{ env.DOCKER_IMAGE }}:test ${{ env.REGISTRY }}/${REPO_LOWER}:${{ github.sha }}
+          docker push ${{ env.REGISTRY }}/${REPO_LOWER}:staging
+          docker push ${{ env.REGISTRY }}/${REPO_LOWER}:${{ github.sha }}
 
       - name: Deploy to staging (simulation)
         run: |
           echo "Deploying to staging environment..."
-          echo "Image: ${{ env.REGISTRY }}/${{ github.repository }}:staging"
+          echo "Image: ${{ env.REGISTRY }}/$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]'):staging"
           echo "Staging URL: https://housing-api-staging.example.com"
           echo "Staging deployment completed!"
 
@@ -270,10 +271,11 @@ jobs:
       - name: Deploy to production (simulation)
         run: |
           echo "Deploying to production environment..."
-          docker pull ${{ env.REGISTRY }}/${{ github.repository }}:${{ github.sha }}
-          docker tag ${{ env.REGISTRY }}/${{ github.repository }}:${{ github.sha }} ${{ env.REGISTRY }}/${{ github.repository }}:latest
-          docker push ${{ env.REGISTRY }}/${{ github.repository }}:latest
-          echo "Image: ${{ env.REGISTRY }}/${{ github.repository }}:latest"
+          REPO_LOWER=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+          docker pull ${{ env.REGISTRY }}/${REPO_LOWER}:${{ github.sha }}
+          docker tag ${{ env.REGISTRY }}/${REPO_LOWER}:${{ github.sha }} ${{ env.REGISTRY }}/${REPO_LOWER}:latest
+          docker push ${{ env.REGISTRY }}/${REPO_LOWER}:latest
+          echo "Image: ${{ env.REGISTRY }}/$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]'):latest"
           echo "Production URL: https://housing-api.example.com"
           echo "Production deployment completed!"
 
@@ -314,7 +316,7 @@ jobs:
 
       - name: Install performance testing tools
         run: |
-          pip install locust requests zope.event
+          pip install 'locust[gevent]' requests
 
       - name: Run performance tests
         run: |
